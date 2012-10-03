@@ -15,11 +15,18 @@ public class Main {
             }
         };
 
-        final  Timer clockTimer = new Timer(50, doOneStep);
+        final Timer clockTimer = new Timer(10, doOneStep);
         clockTimer.setCoalesce(true);
         clockTimer.start();
 
     }
+    public static int random(int nr){
+        return (int)(Math.random() * nr);
+    }
+    public static double random(double nr){
+        return (Math.random() * nr);
+    }
+
 }
 // byt ut trail och coordinate mot en worldclass
 // World ska ha en 2d array med alla pixlar

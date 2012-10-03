@@ -3,22 +3,32 @@ import java.awt.*;
 
 public class GUI extends JFrame {
 
-    private static int screenWidth = 1280;
-    private static int screenHeight = 900;
-
+    private static int screenWidth;
+    private static int screenHeight;
     private Screen s;
     private PlayerComponent pc;
+    private JPanel currentPanel;
+    private static GUI reference;
 
     public GUI(PlayerComponent component){
         super("Achtung Die Klone");
+        reference = this;
         pc = component;
+        pc.setSize(screenWidth,screenHeight);
         setLayout(new BorderLayout());
         //chooseDisplayMode();
-        setSize(1280,900);
+        screenWidth = 1280;
+        screenHeight = 800;
         createPlayers();
-        new World(screenWidth,screenHeight);
-        System.out.printf("%d : %d\n",screenWidth,screenHeight);
+        pack();
+        setSize(screenWidth,screenHeight);
+        currentPanel = new GamePanel();
+        getContentPane().add(currentPanel,BorderLayout.WEST);
+
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+
     }
 
     public void chooseDisplayMode(){
@@ -53,7 +63,7 @@ public class GUI extends JFrame {
         run(choice);
     }
     public void createPlayers(){
-        add(pc, BorderLayout.CENTER);
+        add(pc);
 
         //add(GameManager.createPlayer(),BorderLayout.CENTER);
         //add(GameManager.createPlayer(),BorderLayout.CENTER);
@@ -72,5 +82,13 @@ public class GUI extends JFrame {
         return screenHeight;
     }
 
+    public static GUI getFrame(){
+        return reference;
+    }
+
+    public GamePanel getGamePanel()
+    {
+        return (GamePanel) currentPanel;
+    }
 
 }

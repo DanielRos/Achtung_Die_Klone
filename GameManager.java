@@ -2,23 +2,25 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Vector;
 
 //Command pattern
 public class GameManager {
-    static ArrayList<Player> playerList = new ArrayList<Player>(6);
+    private static Vector<Player> players;
     static PlayerComponent component;
 
     public GameManager() {
-        Player p = new Player(300,400,"player1",PixelColor.CYAN,KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
+        players = new Vector<Player>(6);
+        Player p = new Player(new Coordinate(300.0,400.0),"player1",Color.CYAN,KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
         component = new PlayerComponent(p);
         p.addPlayerListener(component);
-        playerList.add(p);
+        players.add(p);
         new GUI(component);
 
     }
 
     public void tick(){
-        for (Player p: playerList){
+        for (Player p: players){
             p.move();
         }
     }
@@ -28,15 +30,15 @@ public class GameManager {
             p.addPlayerListener(listener);
     }*/
     public static PlayerComponent createPlayer(){
-        Player p2 = new Player(300,400,"player2",PixelColor.CYAN, KeyEvent.VK_Q, KeyEvent.VK_E);
+        Player p2 = new Player(new Coordinate(400,200),"player2",Color.CYAN, KeyEvent.VK_Q, KeyEvent.VK_E);
         PlayerComponent pComp = new PlayerComponent(p2);
-        playerList.add(p2);
+        players.add(p2);
         p2.addPlayerListener(pComp);
 
         return(pComp);
     }
 
-    public static ArrayList<Player> getPlayerList() {
-        return playerList;
+    public static Vector<Player> getPlayers() {
+        return players;
     }
 }

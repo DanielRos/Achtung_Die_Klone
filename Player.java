@@ -9,10 +9,11 @@ import java.util.Set;
 
 
 public class Player {
+    private static Player reference;
     public Boolean isAlive;
-    private PixelColor color;
+    private Color color;
     private double angle , speed;
-    private int x,y;
+    private Coordinate coordinate;
     private int radius;
 
     private String direction;
@@ -22,14 +23,14 @@ public class Player {
     private int weaponKey;
     private Set<PlayerListener> PlayerListenerSet;
 
-    public Player(int x, int y, String playerName, PixelColor color, int turnLeft, int turnRight) {
-        this.x = x;
-        this.y = y;
+    public Player(Coordinate c, String playerName, Color color, int turnLeft, int turnRight) {
+        this.coordinate = c;
         this.name = playerName;
         this.color = color;
         this.rightKey = turnRight;
         this.leftKey = turnLeft;
         this.weaponKey = weaponKey;
+        reference = this;
 
         isAlive = true;
         angle =  0;
@@ -50,13 +51,14 @@ public class Player {
         for(PlayerListener pl : PlayerListenerSet){
             pl.playerChanged();
         }
+
     }
     public void move(){
 
-        if (direction == "R") angle+=4;
-        else if(direction == "L") angle -=4;
+        if (direction == "R") angle+=2;
+        else if(direction == "L") angle -=2;
 
-        speed = 4;
+        speed = 2;
         angle %= 360;
 
         if (angle < 0) {
@@ -64,8 +66,8 @@ public class Player {
         }
         float r = (float)Math.toRadians(angle);
 
-        x += Math.cos(r) * speed;
-        y += Math.sin(r)* speed;
+        coordinate.moveX(Math.cos(r) * speed);
+        coordinate.moveY(Math.sin(r)* speed);
 
 
             //position = new Coordinate(coordinate.getX(),coordinate.getY());
@@ -78,11 +80,11 @@ public class Player {
 
     }
 
-    public int getX(){
-        return x;
+    public double getX(){
+        return coordinate.getX();
     }
-    public int getY(){
-        return y;
+    public double getY(){
+        return coordinate.getY();
     }
 
     public int getLeftKey() {
@@ -97,12 +99,15 @@ public class Player {
         direction = d;
     }
 
-    public PixelColor getColor() {
+    public Color getColor() {
         return color;
     }
 
     public int getRadius() {
         return radius;
+    }
+    public static Player getPlayer(){
+        return reference;
     }
 }
 

@@ -1,23 +1,24 @@
 
 public class Coordinate {
-    private int x;
-    private int y;
-    public Coordinate(int X, int Y) {
+    private double x;
+    private double y;
+
+    public Coordinate(double X, double Y) {
         this.x = X;
         this.y = Y;
     }
-    public void moveX(int increment){
+    public void moveX(double increment){
         this.x += increment;
     }
-    public void moveY(int increment){
+    public void moveY(double increment){
         this.y += increment;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 }
