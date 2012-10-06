@@ -2,68 +2,46 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
+import java.awt.Stroke;
 
 public class SnakePanel extends JPanel{
 
     private BufferedImage bImage;
     private Graphics bImageGraphics ;
     private boolean drawBorders = false;
-    private Vector<Player> players;
-    private int count = 0;
+    private int borderDistance;
+
 
     public SnakePanel(int width,int height) {
 
+        borderDistance = 10;
 
-        players = GameManager.getPlayers();
-        bImage = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-        bImage = configureImage(bImage, false);
+        bImage = new BufferedImage(width-borderDistance*2,height-borderDistance*4, BufferedImage.TYPE_INT_ARGB);
+        bImage = configureImage(bImage);
         bImageGraphics = bImage.getGraphics();
         Dimension d = new Dimension(width,height);
         setSize(width,height);
         setPreferredSize(d);
         System.out.println("Snake: " + getWidth());
+        drawBorders = true;
         setVisible(true);
 
     }
 
-    public static BufferedImage configureImage(BufferedImage bImage, boolean created) {
+    public static BufferedImage configureImage(BufferedImage bImage) {
 
-        if(!created){
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             GraphicsConfiguration gc = gd.getDefaultConfiguration();
 
-            boolean isTransparent = bImage.getColorModel().hasAlpha();
-
-            BufferedImage img2 = gc.createCompatibleImage(bImage.getWidth(), bImage.getHeight(),Transparency.OPAQUE);
+            BufferedImage img2 = gc.createCompatibleImage(bImage.getWidth(), bImage.getHeight(),Transparency.BITMASK);
             Graphics2D g = img2.createGraphics();
-            g.drawImage(bImage, 0, 0, null);
-            g.setColor(Color.RED);
-            //System.out.println(isTransparent);
-            //System.out.println(bImage.getMinX() + " " + bImage.getMinY() + " " + bImage.getWidth() + " " + bImage.getHeight());
-            //System.out.println();
-            g.setColor(Color.ORANGE);
-            //g.fillRect(0,0,100,100);
-            g.fillOval(0,0,PlayerComponent.getOwner().getRadius()*2,PlayerComponent.getOwner().getRadius()*2);
+
+            g.setColor(Color.BLACK);
+            g.fillRect(0,0,bImage.getWidth(),bImage.getHeight());
+
             g.dispose();
 
-            System.out.println("frame: "+GUI.getFrame().getWidth());
-            System.out.println("gamePanel: "+GamePanel.getGamePanel().getWidth());
-            //System.out.println(getInstance().getWidth());
-            System.out.println("playerComponent: "+PlayerComponent.getReference().getWidth());
-            System.out.println(bImage.getWidth()+ "< width  pixel som man inte kan se > " + bImage.getRaster().getHeight() );
             return img2;
-
-        } else{
-            Graphics g = bImage.getGraphics();
-            Graphics2D g2 = (Graphics2D)g;
-            g2.drawImage(bImage,0,0,null);
-            g2.setColor(Color.CYAN);
-            if(getInstance().count % 10 > 5 && getInstance().count %10 < 10 ) g2.setColor(Color.RED);
-            g2.fillRect(0,0,100,100);
-            getInstance().count++;
-            g2.dispose();
-            return bImage;
-        }
     }
 
 
@@ -74,24 +52,38 @@ public class SnakePanel extends JPanel{
 
     public void repaint(){
         if(bImageGraphics != null){
-            PlayerComponent.paintPlayer(bImageGraphics);
-            System.out.println( bImage.getRGB((int) PlayerComponent.getOwner().getX()+20, (int) PlayerComponent.getOwner().getY()+20));
-            //System.out.println(PlayerComponent.getOwner().getX());
-            //if(count > 200)configureImage(bImage,true);
-           // System.out.println(count);
-            //count++;
-            super.repaint();
+            Rectangle change;
+            Coordinate c;
+            for(PlayerComponent pc: GameManager.getpComponents()){
+                c = pc.getOwner().getNextPixels();
+
+                System.out.println((int)c.getX() + " " + (int)c.getY());
+                int colorOfNextPixel = bImage.getRGB((int)c.getX(),(int)c.getY());
+
+                System.out.println(inBounds(c));
+
+                if(colorOfNextPixel == -16777216 && inBounds(c) == true){
+                    change = pc.paintPlayer(bImageGraphics);
+                    super.repaint(change);
+                }
+
+                else{pc.getOwner().isAlive = false;
+                }
+
+            }
+
         }
+
     }
 
-
-    public Graphics getPanelGraphics(){
-        return bImageGraphics;
+    private boolean inBounds(Coordinate c) {
+        Boolean inside= true;
+        int x = (int)c.getX();
+        int y = (int)c.getY();
+        if( x < 1 && y < 1 && x > bImage.getWidth() - 1 && y > bImage.getHeight() - 1)inside = false;
+        return inside;
     }
 
-    public BufferedImage getImage() {
-        return bImage;
-    }
 
     public static SnakePanel getInstance(){
         return GUI.getFrame().getGamePanel().getSnakePanel();
