@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.util.Vector;
 
 
 public class Player {
@@ -23,8 +23,8 @@ public class Player {
     private int weaponKey;
     private Set<PlayerListener> PlayerListenerSet;
 
-    public Player(Coordinate c, String playerName, Color color, int turnLeft, int turnRight) {
-        this.coordinate = c;
+    public Player(String playerName, Color color, int turnLeft, int turnRight) {
+        this.coordinate = new Coordinate(randomStartPos("x"),randomStartPos("y")) ;
         this.name = playerName;
         this.color = color;
         this.rightKey = turnRight;
@@ -33,13 +33,31 @@ public class Player {
         reference = this;
 
         isAlive = true;
-        angle =  0;
+        angle =  Main.random(360);
         PlayerListenerSet = new HashSet<PlayerListener>();
         direction = "";
         radius = 5;
     }
 
-    public void getNextPixel(){}
+    private double randomStartPos(String pos) {
+        double start = GUI.getScreenHeight()/2;
+        double width = GUI.getScreenWidth();
+        double height = GUI.getScreenHeight();
+        if(pos.equals("x")){
+            start = Main.random(width);
+            if(start > width *0.8) start -= width * 0.2;
+            else if (start < width * 0.2) start += width * 0.2;
+            return start;
+        }
+        else if(pos.equals("y")){
+            start = Main.random(height);
+            if(start > height *0.8) start -= height * 0.2;
+            else if (start < height * 0.2) start += height * 0.2;
+            return start;
+        }
+
+        return start;
+    }
 
     public void holeGeneration(){}
 
@@ -54,30 +72,31 @@ public class Player {
 
     }
     public void move(){
+        if(isAlive){
+            if (direction == "R") angle+=2;
+            else if(direction == "L") angle -=2;
 
-        if (direction == "R") angle+=2;
-        else if(direction == "L") angle -=2;
+            speed = 1.5;
+            angle %= 360;
 
-        speed = 2;
-        angle %= 360;
+            if (angle < 0) {
+                angle += 360;
+            }
+            float r = (float)Math.toRadians(angle);
 
-        if (angle < 0) {
-            angle += 360;
+            coordinate.moveX(Math.cos(r) * speed);
+            coordinate.moveY(Math.sin(r)* speed);
+
+            notifyListeners();
         }
+    }
+    public Coordinate getNextPixels(){
         float r = (float)Math.toRadians(angle);
+        //Vector<Coordinate> nextCoordinates = new Vector<Coordinate>();
+        int x = (int) coordinate.getX()+ radius;
+        int y = (int) coordinate.getY()+ radius;
 
-        coordinate.moveX(Math.cos(r) * speed);
-        coordinate.moveY(Math.sin(r)* speed);
-
-
-            //position = new Coordinate(coordinate.getX(),coordinate.getY());
-
-        //position = new Coordinate(coordinate.getX(),coordinate.getY());
-            //trail.pushCoordinate(position);
-           // System.out.println("pushing coo   " + coordinate.getX() + "  "+ coordinate.getY() +"\n");
-               //sesmt
-        notifyListeners();
-
+        return new Coordinate(x + Math.cos(r) * speed, y + Math.sin(r)* speed);
     }
 
     public double getX(){
@@ -108,6 +127,10 @@ public class Player {
     }
     public static Player getPlayer(){
         return reference;
+    }
+
+    public String getName() {
+        return name;
     }
 }
 

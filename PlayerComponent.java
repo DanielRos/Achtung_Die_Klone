@@ -11,62 +11,55 @@ import java.util.EnumMap;
 
 
 public class PlayerComponent extends JComponent implements PlayerListener{
-    private EnumMap enumMap;
-    private Action leftAction;
-    private Action rightAction;
-    private Action actionReleased;
-    private ActionMap aMap;
+
     private InputMap iMap;
     private KeyStroke leftKey;
     private KeyStroke rightKey;
-    private static Player owner;
+    private Player owner;
     private static PlayerComponent reference;
 
 
     public PlayerComponent(Player p) {
         this.owner = p;
         reference = this;
-        //setSize(GUI.getScreenWidth(),GUI.getScreenHeight());
         bindKeys();
-        //setVisible(true);
-        setOpaque(false);
-
+        setVisible(true);
     }
 
     public void bindKeys(){
         iMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        aMap = getActionMap();
+        ActionMap aMap = getActionMap();
 
-        leftAction = new LeftAction();
-        rightAction = new RightAction();
-        actionReleased = new Released();
+        Action leftAction = new LeftAction();
+        Action rightAction = new RightAction();
+        Action actionReleased = new Released();
 
         iMap.put(KeyStroke.getKeyStroke(owner.getLeftKey(), 0, false), "left_pressed");
         aMap.put("left_pressed", leftAction);
 
         iMap.put(KeyStroke.getKeyStroke(owner.getLeftKey(), 0, true), "left_released");
-        aMap.put("left_released", actionReleased );
+        aMap.put("left_released", actionReleased);
 
         iMap.put(KeyStroke.getKeyStroke(owner.getRightKey(), 0, false), "right_pressed");
         aMap.put("right_pressed", rightAction);
 
         iMap.put(KeyStroke.getKeyStroke(owner.getRightKey(), 0, true), "right_released");
-        aMap.put("right_released", actionReleased );
+        aMap.put("right_released", actionReleased);
     }
 
-    public static void paintPlayer(Graphics g){
+    public Rectangle paintPlayer(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //BufferedImage drawer = new BufferedImage(200,200,BufferedImage.TYPE_INT_ARGB);
         int x = (int) owner.getX() - owner.getRadius();
-        int y = (int) owner.getY() - owner.getRadius();
+        int y = (int) owner.getY() + owner.getRadius();
         int lineThickness = owner.getRadius()*2;
-        g.setColor(Color.MAGENTA);
+        g.setColor(owner.getColor());
         g.fillOval(x, y, lineThickness, lineThickness);
-
+        //Coordinate c = owner.getNextPixels();
+        //g.drawOval((int)c.getX(),(int)c.getY(),lineThickness/2,lineThickness/2);
         //g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
-       // return new Rectangle(x,y,lineThickness,lineThickness);
+        return new Rectangle(x-owner.getRadius() ,y - owner.getRadius(), lineThickness*2,lineThickness*2);
     }
 
     public double calcDistanceTo(double x,double y){
@@ -75,7 +68,7 @@ public class PlayerComponent extends JComponent implements PlayerListener{
         return distance;
     }
 
-    public static Player getOwner(){
+    public Player getOwner(){
         return owner;
     }
 

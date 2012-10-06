@@ -20,6 +20,7 @@ public class Main {
         clockTimer.start();
 
     }
+
     public static int random(int nr){
         return (int)(Math.random() * nr);
     }

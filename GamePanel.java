@@ -7,7 +7,7 @@ public class GamePanel extends JPanel{
 
     public GamePanel() {
         reference = this;
-        //setBackground(Color.BLACK);
+
 
         int width = GUI.getScreenWidth();
         int height = GUI.getScreenHeight();

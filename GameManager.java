@@ -7,16 +7,12 @@ import java.util.Vector;
 //Command pattern
 public class GameManager {
     private static Vector<Player> players;
-    static PlayerComponent component;
+    private static Vector<PlayerComponent> pComponents;
 
     public GameManager() {
         players = new Vector<Player>(6);
-        Player p = new Player(new Coordinate(300.0,400.0),"player1",Color.CYAN,KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
-        component = new PlayerComponent(p);
-        p.addPlayerListener(component);
-        players.add(p);
-        new GUI(component);
-
+        pComponents = new Vector<PlayerComponent>(6);
+        new GUI();
     }
 
     public void tick(){
@@ -25,20 +21,21 @@ public class GameManager {
         }
     }
 
-/*    public void addPlayerListener(PlayerListener listener){
-        for (Player p : playerList)
-            p.addPlayerListener(listener);
-    }*/
-    public static PlayerComponent createPlayer(){
-        Player p2 = new Player(new Coordinate(400,200),"player2",Color.CYAN, KeyEvent.VK_Q, KeyEvent.VK_E);
-        PlayerComponent pComp = new PlayerComponent(p2);
-        players.add(p2);
-        p2.addPlayerListener(pComp);
+    public static PlayerComponent createPlayer(String name, Color color, int leftKey, int rightKey){
+        Player player = new Player(name,color, leftKey, rightKey);
+        PlayerComponent pComp = new PlayerComponent(player);
+        players.add(player);
+        player.addPlayerListener(pComp);
+        pComponents.add(pComp);
 
         return(pComp);
     }
 
     public static Vector<Player> getPlayers() {
         return players;
+    }
+
+    public static Vector<PlayerComponent> getpComponents() {
+        return pComponents;
     }
 }

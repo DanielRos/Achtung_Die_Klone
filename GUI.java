@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class GUI extends JFrame {
 
@@ -10,11 +11,10 @@ public class GUI extends JFrame {
     private JPanel currentPanel;
     private static GUI reference;
 
-    public GUI(PlayerComponent component){
+    public GUI(){
         super("Achtung Die Klone");
         reference = this;
-        pc = component;
-        pc.setSize(screenWidth,screenHeight);
+
         setLayout(new BorderLayout());
         //chooseDisplayMode();
         screenWidth = 1280;
@@ -63,11 +63,11 @@ public class GUI extends JFrame {
         run(choice);
     }
     public void createPlayers(){
-        add(pc);
+        add(GameManager.createPlayer("Player1", Color.MAGENTA, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
 
-        //add(GameManager.createPlayer(),BorderLayout.CENTER);
-        //add(GameManager.createPlayer(),BorderLayout.CENTER);
+        add(GameManager.createPlayer("Player2", Color.CYAN, KeyEvent.VK_Q,KeyEvent.VK_E));
 
+        add(GameManager.createPlayer("Player3", Color.BLUE, KeyEvent.VK_A,KeyEvent.VK_D));
     }
     public void run(DisplayMode dm){
         //getContentPane().setBackground(Color.BLACK);
