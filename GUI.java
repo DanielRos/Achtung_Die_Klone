@@ -7,7 +7,7 @@ public class GUI extends JFrame {
     private static int screenWidth;
     private static int screenHeight;
     private Screen s;
-    private PlayerComponent pc;
+
     private JPanel currentPanel;
     private static GUI reference;
 
@@ -63,11 +63,11 @@ public class GUI extends JFrame {
         run(choice);
     }
     public void createPlayers(){
-        add(GameManager.createPlayer("Player1", Color.MAGENTA, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
+        add(GameManager.createPlayer("Player1", Color.BLUE, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
 
-        add(GameManager.createPlayer("Player2", Color.CYAN, KeyEvent.VK_Q,KeyEvent.VK_E));
+        add(GameManager.createPlayer("Player2", Color.LIGHT_GRAY, KeyEvent.VK_Q,KeyEvent.VK_E));
 
-        add(GameManager.createPlayer("Player3", Color.BLUE, KeyEvent.VK_A,KeyEvent.VK_D));
+        add(GameManager.createPlayer("Player3", Color.GREEN, KeyEvent.VK_A,KeyEvent.VK_D));
     }
     public void run(DisplayMode dm){
         //getContentPane().setBackground(Color.BLACK);

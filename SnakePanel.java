@@ -7,23 +7,17 @@ import java.awt.Stroke;
 public class SnakePanel extends JPanel{
 
     private BufferedImage bImage;
-    private Graphics bImageGraphics ;
-    private boolean drawBorders = false;
-    private int borderDistance;
-
+    private final Graphics bImageGraphics ;
+    private final int borderDistance = 10;
 
     public SnakePanel(int width,int height) {
 
-        borderDistance = 10;
 
         bImage = new BufferedImage(width-borderDistance*2,height-borderDistance*4, BufferedImage.TYPE_INT_ARGB);
         bImage = configureImage(bImage);
         bImageGraphics = bImage.getGraphics();
         Dimension d = new Dimension(width,height);
-        setSize(width,height);
         setPreferredSize(d);
-        System.out.println("Snake: " + getWidth());
-        drawBorders = true;
         setVisible(true);
 
     }
@@ -55,19 +49,29 @@ public class SnakePanel extends JPanel{
             Rectangle change;
             Coordinate c;
             for(PlayerComponent pc: GameManager.getpComponents()){
-                c = pc.getOwner().getNextPixels();
+               Player p = pc.getOwner();
+                c = p.getNextPixels(p.getCoordinate(),p.getAngle(),p.getSpeed(),p.getRadius());
+                int colorOfNextPixel = 0;
 
-                System.out.println((int)c.getX() + " " + (int)c.getY());
-                int colorOfNextPixel = bImage.getRGB((int)c.getX(),(int)c.getY());
+                //System.out.println((int)c.getX() + " " + (int)c.getY());
+                if (inBounds(c)) colorOfNextPixel = bImage.getRGB((int)c.getX(),(int)c.getY());
 
-                System.out.println(inBounds(c));
 
-                if(colorOfNextPixel == -16777216 && inBounds(c) == true){
+                int black = -16777216;
+                int yellow = -256;
+
+                if(colorOfNextPixel == black && inBounds(c)
+                        || colorOfNextPixel == yellow && inBounds(c)){
                     change = pc.paintPlayer(bImageGraphics);
                     super.repaint(change);
+
                 }
 
-                else{pc.getOwner().isAlive = false;
+                else{
+                    if (p.isAlive) System.out.println(pc.getOwner().getColor());
+                    p.isAlive = false;
+                    //System.out.println(pc.getOwner().getColor());
+                    //System.out.println(bImage.getRGB((int)c.getX(),(int)c.getY()));
                 }
 
             }
@@ -77,11 +81,16 @@ public class SnakePanel extends JPanel{
     }
 
     private boolean inBounds(Coordinate c) {
-        Boolean inside= true;
+
         int x = (int)c.getX();
         int y = (int)c.getY();
-        if( x < 1 && y < 1 && x > bImage.getWidth() - 1 && y > bImage.getHeight() - 1)inside = false;
-        return inside;
+        int bx = bImage.getWidth();
+        int by = bImage.getHeight();
+
+        return ( x > 0 &&
+                y > 0 &&
+                x < bx &&
+                y < by );
     }
 
 

@@ -9,19 +9,20 @@ import java.util.Vector;
 
 
 public class Player {
+
     private static Player reference;
     public Boolean isAlive;
-    private Color color;
+    private final Color color;
     private double angle , speed;
-    private Coordinate coordinate;
-    private int radius;
+    private final Coordinate coordinate;
+    private final int radius;
 
     private String direction;
     private String name;
     private int leftKey;
     private int rightKey;
     private int weaponKey;
-    private Set<PlayerListener> PlayerListenerSet;
+    private final Set<PlayerListener> PlayerListenerSet;
 
     public Player(String playerName, Color color, int turnLeft, int turnRight) {
         this.coordinate = new Coordinate(randomStartPos("x"),randomStartPos("y")) ;
@@ -37,6 +38,7 @@ public class Player {
         PlayerListenerSet = new HashSet<PlayerListener>();
         direction = "";
         radius = 5;
+
     }
 
     private double randomStartPos(String pos) {
@@ -73,10 +75,10 @@ public class Player {
     }
     public void move(){
         if(isAlive){
-            if (direction == "R") angle+=2;
-            else if(direction == "L") angle -=2;
+            if (direction.equals("R")) angle += 2;
+            else if(direction.equals("L")) angle -= 2;
 
-            speed = 1.5;
+            speed = 2;
             angle %= 360;
 
             if (angle < 0) {
@@ -90,13 +92,18 @@ public class Player {
             notifyListeners();
         }
     }
-    public Coordinate getNextPixels(){
+
+    public Coordinate getNextPixels(Coordinate c, double angle, double speed, int radius){
         float r = (float)Math.toRadians(angle);
         //Vector<Coordinate> nextCoordinates = new Vector<Coordinate>();
-        int x = (int) coordinate.getX()+ radius;
-        int y = (int) coordinate.getY()+ radius;
+        double x =  c.getX();
+        double y =  c.getY();
 
-        return new Coordinate(x + Math.cos(r) * speed, y + Math.sin(r)* speed);
+        double dx =  Math.cos(r) * radius*2;
+        double dy =  Math.sin(r) * radius*2;
+
+        return new Coordinate (x + dx, y + dy);
+
     }
 
     public double getX(){
@@ -131,6 +138,18 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 }
 

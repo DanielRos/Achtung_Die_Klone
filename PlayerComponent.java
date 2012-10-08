@@ -19,11 +19,13 @@ public class PlayerComponent extends JComponent implements PlayerListener{
     private static PlayerComponent reference;
 
 
+
     public PlayerComponent(Player p) {
         this.owner = p;
         reference = this;
         bindKeys();
         setVisible(true);
+
     }
 
     public void bindKeys(){
@@ -50,16 +52,19 @@ public class PlayerComponent extends JComponent implements PlayerListener{
     public Rectangle paintPlayer(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int x = (int) owner.getX() - owner.getRadius();
-        int y = (int) owner.getY() + owner.getRadius();
-        int lineThickness = owner.getRadius()*2;
+        int r = owner.getRadius();
+        int x = (int) owner.getX() - r;
+        int y = (int) owner.getY() - r;
+        int lineThickness = r*2;
         g.setColor(owner.getColor());
         g.fillOval(x, y, lineThickness, lineThickness);
-        //Coordinate c = owner.getNextPixels();
-        //g.drawOval((int)c.getX(),(int)c.getY(),lineThickness/2,lineThickness/2);
+
+        Coordinate nextPixel = owner.getNextPixels(owner.getCoordinate(),owner.getAngle(),owner.getSpeed(), owner.getRadius());
+        g.setColor(Color.RED);
+       // g.drawLine((int)nextPixel.getX() ,(int)nextPixel.getY(),(int)nextPixel.getX(),(int)nextPixel.getY());
         //g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
-        return new Rectangle(x-owner.getRadius() ,y - owner.getRadius(), lineThickness*2,lineThickness*2);
+
+        return new Rectangle(x-1 ,y - 1, lineThickness*2,lineThickness*2);
     }
 
     public double calcDistanceTo(double x,double y){
