@@ -13,16 +13,18 @@ import java.util.EnumMap;
 public class PlayerComponent extends JComponent implements PlayerListener{
 
     private InputMap iMap;
-    private KeyStroke leftKey;
-    private KeyStroke rightKey;
+    private int leftKey;
+    private int rightKey;
+    private KeyStroke pauseKey = KeyStroke.getKeyStroke( "SPACE" );
     private Player owner;
     private static PlayerComponent reference;
 
-
-
     public PlayerComponent(Player p) {
         this.owner = p;
+        this.leftKey = owner.getLeftKey();
+        this.rightKey = owner.getRightKey();
         reference = this;
+
         bindKeys();
         setVisible(true);
 
@@ -35,18 +37,22 @@ public class PlayerComponent extends JComponent implements PlayerListener{
         Action leftAction = new LeftAction();
         Action rightAction = new RightAction();
         Action actionReleased = new Released();
+        Action pauseUnpause = new PauseUnpause();
 
-        iMap.put(KeyStroke.getKeyStroke(owner.getLeftKey(), 0, false), "left_pressed");
+        iMap.put(KeyStroke.getKeyStroke(leftKey, 0, false), "left_pressed");
         aMap.put("left_pressed", leftAction);
 
-        iMap.put(KeyStroke.getKeyStroke(owner.getLeftKey(), 0, true), "left_released");
+        iMap.put(KeyStroke.getKeyStroke(leftKey, 0, true), "left_released");
         aMap.put("left_released", actionReleased);
 
-        iMap.put(KeyStroke.getKeyStroke(owner.getRightKey(), 0, false), "right_pressed");
+        iMap.put(KeyStroke.getKeyStroke(rightKey, 0, false), "right_pressed");
         aMap.put("right_pressed", rightAction);
 
-        iMap.put(KeyStroke.getKeyStroke(owner.getRightKey(), 0, true), "right_released");
+        iMap.put(KeyStroke.getKeyStroke(rightKey, 0, true), "right_released");
         aMap.put("right_released", actionReleased);
+
+        iMap.put(pauseKey, "pause/unpause");
+        aMap.put("pause/unpause", pauseUnpause);
     }
 
     public Rectangle paintPlayer(Graphics g){
@@ -59,12 +65,7 @@ public class PlayerComponent extends JComponent implements PlayerListener{
         g.setColor(owner.getColor());
         g.fillOval(x, y, lineThickness, lineThickness);
 
-        Coordinate nextPixel = owner.getNextPixels(owner.getCoordinate(),owner.getAngle(),owner.getSpeed(), owner.getRadius());
-        g.setColor(Color.RED);
-       // g.drawLine((int)nextPixel.getX() ,(int)nextPixel.getY(),(int)nextPixel.getX(),(int)nextPixel.getY());
-        //g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
-
-        return new Rectangle(x-1 ,y - 1, lineThickness*2,lineThickness*2);
+        return new Rectangle(x-lineThickness ,y - lineThickness, lineThickness*3,lineThickness*3);
     }
 
     public double calcDistanceTo(double x,double y){
@@ -84,7 +85,6 @@ public class PlayerComponent extends JComponent implements PlayerListener{
     @Override
     public void playerChanged() {
         SnakePanel.getInstance().repaint();
-
     }
 
     class LeftAction extends AbstractAction {
@@ -94,7 +94,7 @@ public class PlayerComponent extends JComponent implements PlayerListener{
                 owner.setDirection("L");
                 System.out.println("LEFT PRESSED");
             } else{
-                iMap.put(leftKey, "none");
+                iMap.put(KeyStroke.getKeyStroke((char) leftKey), "none");
 
             }
         }
@@ -107,7 +107,7 @@ public class PlayerComponent extends JComponent implements PlayerListener{
                 owner.setDirection("R");
                 System.out.println("RIGHT PRESSED");
             }else{
-                iMap.put(rightKey, "none");}
+                iMap.put(KeyStroke.getKeyStroke((char) rightKey), "none");}
         }
     }
 
@@ -115,11 +115,17 @@ public class PlayerComponent extends JComponent implements PlayerListener{
 
         public void actionPerformed(ActionEvent e) {
             owner.setDirection("");
-            System.out.println("RELEASED");
-
         }
     }
 
+    class PauseUnpause extends AbstractAction {
+
+        public void actionPerformed(ActionEvent e) {
+            if(GameManager.isPaused()) GameManager.setPaused(false);
+
+            else GameManager.setPaused(true);
+        }
+    }
 }
 
 

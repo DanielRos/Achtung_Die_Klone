@@ -7,6 +7,12 @@ public class Coordinate {
         this.x = X;
         this.y = Y;
     }
+
+    public Coordinate(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public void moveX(double increment){
         this.x += increment;
     }
@@ -20,5 +26,27 @@ public class Coordinate {
 
     public double getY() {
         return y;
+    }
+    public int getIntX(){
+        return (int)x;
+    }
+    public int getIntY(){
+        return (int)y;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinate{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 }

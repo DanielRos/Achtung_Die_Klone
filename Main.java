@@ -10,7 +10,7 @@ public class Main {
 
         Action doOneStep = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-               gm.tick();
+               gm.getState().tick();
 
             }
         };

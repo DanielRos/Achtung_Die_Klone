@@ -1,3 +1,5 @@
+import sun.security.jca.GetInstance;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,19 +17,21 @@ public class GUI extends JFrame {
         super("Achtung Die Klone");
         reference = this;
 
-        setLayout(new BorderLayout());
         //chooseDisplayMode();
         screenWidth = 1280;
         screenHeight = 800;
-        createPlayers();
-        pack();
+
         setSize(screenWidth,screenHeight);
-        currentPanel = new GamePanel();
-        getContentPane().add(currentPanel,BorderLayout.WEST);
+
+        currentPanel = new SetupPanel(screenWidth, screenHeight);
+
+        currentPanel.setLocation(0,0);
+        getContentPane().add(currentPanel);
 
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+        setResizable(false);
 
     }
 
@@ -63,17 +67,18 @@ public class GUI extends JFrame {
         run(choice);
     }
     public void createPlayers(){
-        add(GameManager.createPlayer("Player1", Color.BLUE, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
+        add(GameManager.createPlayer("Gargamel", Color.BLUE, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
 
-        add(GameManager.createPlayer("Player2", Color.LIGHT_GRAY, KeyEvent.VK_Q,KeyEvent.VK_E));
+        add(GameManager.createPlayer("Smurfan", Color.MAGENTA, KeyEvent.VK_Q,KeyEvent.VK_E));
 
-        add(GameManager.createPlayer("Player3", Color.GREEN, KeyEvent.VK_A,KeyEvent.VK_D));
+        add(GameManager.createPlayer("Tron", Color.GREEN, KeyEvent.VK_A,KeyEvent.VK_D));
     }
+
     public void run(DisplayMode dm){
-        //getContentPane().setBackground(Color.BLACK);
         s = new Screen();
         s.setFullScreen(dm, this);
     }
+
     public static int getScreenWidth() {
         return screenWidth;
     }
@@ -82,13 +87,26 @@ public class GUI extends JFrame {
         return screenHeight;
     }
 
-    public static GUI getFrame(){
+    public static GUI getInstance(){
         return reference;
     }
 
-    public GamePanel getGamePanel()
+    public JPanel getCurrentPanel()
     {
-        return (GamePanel) currentPanel;
+        return currentPanel;
+    }
+
+    public void setPanel(GamePanel panel)
+    {
+        getInstance().getContentPane().removeAll();
+        getInstance().getContentPane().invalidate();
+        currentPanel = panel;
+        currentPanel.requestFocus();
+        getInstance().setContentPane(currentPanel);
+        validate();
+        setVisible(true);
+
+        createPlayers();
     }
 
 }
