@@ -1,8 +1,5 @@
-import sun.security.jca.GetInstance;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class GUI extends JFrame {
 
@@ -10,7 +7,9 @@ public class GUI extends JFrame {
     private static int screenHeight;
     private Screen s;
 
-    private JPanel currentPanel;
+    JPanel cards;
+    final static String SETUPPANEL = "Setup";
+    final static String GAMEPANEL = "Start Game";
     private static GUI reference;
 
     public GUI(){
@@ -23,11 +22,14 @@ public class GUI extends JFrame {
 
         setSize(screenWidth,screenHeight);
 
-        currentPanel = new SetupPanel(screenWidth, screenHeight);
+        JPanel card1 = new SetupPanel(screenWidth, screenHeight);
 
-        currentPanel.setLocation(0,0);
-        getContentPane().add(currentPanel);
-
+        JPanel card2 = new GamePanel();
+        cards = new JPanel(new CardLayout());
+        cards.setLayout(new CardLayout());
+        cards.add(card1, SETUPPANEL);
+        cards.add(card2, GAMEPANEL);
+        add(cards);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
@@ -66,13 +68,6 @@ public class GUI extends JFrame {
 
         run(choice);
     }
-    public void createPlayers(){
-        add(GameManager.createPlayer("Gargamel", Color.BLUE, KeyEvent.VK_LEFT,KeyEvent.VK_RIGHT));
-
-        add(GameManager.createPlayer("Smurfan", Color.MAGENTA, KeyEvent.VK_Q,KeyEvent.VK_E));
-
-        add(GameManager.createPlayer("Tron", Color.GREEN, KeyEvent.VK_A,KeyEvent.VK_D));
-    }
 
     public void run(DisplayMode dm){
         s = new Screen();
@@ -91,22 +86,12 @@ public class GUI extends JFrame {
         return reference;
     }
 
-    public JPanel getCurrentPanel()
+    public void setPanel(String changeTo)
     {
-        return currentPanel;
+        CardLayout cl = (CardLayout)cards.getLayout();
+        cl.show(cards, changeTo);
+
+        GameManager.setState(changeTo, SETUPPANEL, GAMEPANEL);
+
     }
-
-    public void setPanel(GamePanel panel)
-    {
-        getInstance().getContentPane().removeAll();
-        getInstance().getContentPane().invalidate();
-        currentPanel = panel;
-        currentPanel.requestFocus();
-        getInstance().setContentPane(currentPanel);
-        validate();
-        setVisible(true);
-
-        createPlayers();
-    }
-
 }

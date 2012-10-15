@@ -3,11 +3,7 @@ import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumMap;
+
 
 
 public class PlayerComponent extends JComponent implements PlayerListener{
@@ -17,17 +13,16 @@ public class PlayerComponent extends JComponent implements PlayerListener{
     private int rightKey;
     private KeyStroke pauseKey = KeyStroke.getKeyStroke( "SPACE" );
     private Player owner;
-    private static PlayerComponent reference;
+    private double holeCounter;
 
     public PlayerComponent(Player p) {
         this.owner = p;
         this.leftKey = owner.getLeftKey();
         this.rightKey = owner.getRightKey();
-        reference = this;
 
         bindKeys();
         setVisible(true);
-
+        holeCounter = 0;
     }
 
     public void bindKeys(){
@@ -62,24 +57,20 @@ public class PlayerComponent extends JComponent implements PlayerListener{
         int x = (int) owner.getX() - r;
         int y = (int) owner.getY() - r;
         int lineThickness = r*2;
+
         g.setColor(owner.getColor());
-        g.fillOval(x, y, lineThickness, lineThickness);
+        if(holeCounter > 900)holeCounter = 0;
 
+        //rita ut en cirkel ifall det inte ska vara ett hål där
+        if(holeCounter % 150 > 30 )g.fillOval(x, y, lineThickness, lineThickness);
+        holeCounter++;
+
+        //returnerar en rektangel runt den ytan som har ändrats som behöver målas om
         return new Rectangle(x-lineThickness ,y - lineThickness, lineThickness*3,lineThickness*3);
-    }
-
-    public double calcDistanceTo(double x,double y){
-        double distance;
-        distance = Math.sqrt( Math.pow(owner.getX()-x,2) + Math.pow(owner.getY()-y,2) );
-        return distance;
     }
 
     public Player getOwner(){
         return owner;
-    }
-
-    public static PlayerComponent getReference() {
-        return reference;
     }
 
     @Override

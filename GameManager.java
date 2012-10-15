@@ -11,6 +11,9 @@ public class GameManager {
     private static Vector<Player> players;
     private static Vector<PlayerComponent> pComponents;
     private static GameState currentState;
+    private static GameState setupState;
+    private static GameState inGameState;
+    private static GameState gameEndedState;
     private static Boolean gamePaused = true;
     private static int maxScore;
     private static GameManager reference;
@@ -19,7 +22,9 @@ public class GameManager {
         this.reference = this;
         players = new Vector<Player>(6);
         pComponents = new Vector<PlayerComponent>(6);
-        currentState = new SetupState();
+        setupState = new SetupState();
+        inGameState = new InGameState();
+        currentState = setupState;
         new GUI();
     }
 
@@ -30,6 +35,7 @@ public class GameManager {
         player.addPlayerListener(pComp);
         pComponents.add(pComp);
         maxScore += 10;
+
         return(pComp);
     }
 
@@ -37,11 +43,16 @@ public class GameManager {
         return players;
     }
 
-    public static void setState(GameState state){
-        currentState = state;
+    public static void setState(String changes, String setup, String inGame){
+        if (changes.equals(inGame)){
+            currentState = inGameState;
+        }
+        else if(changes.equals(setup)){
+            currentState = setupState;
+        }
     }
 
-    public static GameState getState() {
+    public static GameState getCurrentState() {
         return currentState;
     }
 
@@ -58,7 +69,7 @@ public class GameManager {
         return reference;
     }
 
-    public int getPlayersAlive() {
+    public static int getPlayersAlive() {
         int alivePlayers = 0;
         for (Player p: players){
             if (p.isAlive) alivePlayers++;
@@ -68,22 +79,55 @@ public class GameManager {
     public Player getCurrentLeader(){
         int leaderPos = 0;
         for (int i = 0; i< players.size(); i++){
-            if (players.get(i).getScore() > leaderPos) leaderPos = i;
+            if (players.get(i).getScore() > players.get(leaderPos).getScore()) {leaderPos = i;}
         }
 
         return players.get(leaderPos);
     }
+    public static int getMaxScore(){
+        return maxScore;
+    }
 
     public class SetupState implements GameState{
         public void tick(){
-            System.out.println("setup!");
-        }
-    }
-    public class GameEndedState implements GameState{
-        public void tick(){
-
+           SetupPanel.getInstance().updateUI();
         }
     }
 
+    public class InGameState implements GameState{
+
+        public void tick() {
+
+            Vector<Player> players = GameManager.getPlayers();
+
+            if(GameManager.getInstance().getCurrentLeader().getScore()<GameManager.getMaxScore()){
+                if(!GameManager.isPaused() && GameManager.getPlayersAlive() > 1){
+                    SnakePanel.getInstance().setDrawArrows(false);
+                    for (Player p: players){
+                        p.move();
+
+                    }
+                }
+                else if(GameManager.isPaused()){
+                    SnakePanel.getInstance().setDrawArrows(true);
+                }
+                else {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {}
+                    for (Player p: players){
+                        p.newRound();
+                        GameManager.setPaused(true);
+                        SnakePanel.getInstance().clearField();
+
+                    }
+                }
+            }
+            else{
+                System.out.println("Game Over!");
+
+            }
+        }
+    }
 }
 

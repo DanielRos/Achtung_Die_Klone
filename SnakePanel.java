@@ -55,8 +55,7 @@ public class SnakePanel extends JPanel{
         g2.setColor(p.getColor());
         g2.setStroke(new BasicStroke(2));
         g2.drawLine(from.getIntX(),from.getIntY(),to.getIntX(),to.getIntY());
-
-    }
+        }
 
     public void repaint(){
 

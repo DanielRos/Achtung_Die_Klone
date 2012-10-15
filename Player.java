@@ -1,11 +1,7 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
+
 
 
 public class Player {
@@ -24,9 +20,6 @@ public class Player {
     private int weaponKey;
     private int score;
 
-    public int getScore() {
-        return score;
-    }
 
     private final Set<PlayerListener> PlayerListenerSet;
 
@@ -77,7 +70,7 @@ public class Player {
 
     }
 
-    public void holeGeneration(){}
+
 
     public void addPlayerListener(PlayerListener pl){
         PlayerListenerSet.add(pl);
@@ -91,8 +84,8 @@ public class Player {
 
     public void move(){
         if(isAlive){
-            if (direction.equals("R")) angle += 2;
-            else if(direction.equals("L")) angle -= 2;
+            if (direction.equals("R")) angle += 2.5;
+            else if(direction.equals("L")) angle -= 2.5;
 
             speed = 2;
             angle %= 360;
@@ -165,7 +158,9 @@ public class Player {
     public int getRadius() {
         return radius;
     }
-
+    public int getScore() {
+        return score;
+    }
     public String getName() {
         return name;
     }

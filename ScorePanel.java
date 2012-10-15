@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.Vector;
+import java.util.*;
 
 
 public class ScorePanel extends JPanel {
@@ -40,21 +40,28 @@ public class ScorePanel extends JPanel {
         }
     }
     public void updateScores(){
-        System.out.println("yo");
+        ArrayList<JLabel> list = new ArrayList<JLabel>();
+        HashMap<Integer, JLabel> scoreToLabel = new HashMap<Integer, JLabel>();
+        Integer[] scores = new Integer[6];
         for (Component c: getComponents()){
             remove(c);
         }
         getInstance().add(title);
         for (PlayerComponent pc : GameManager.getpComponents()){
             Player p = pc.getOwner();
-            JLabel jl = new JLabel("    " + p.getName() + "  " + p.getScore());
+            JLabel jl = new JLabel("    " + p.getName() + "     " + p.getScore());
             jl.setFont(mainFont);
             jl.setForeground(p.getColor());
+            scoreToLabel.put(p.getScore(),jl);
+        }
+        for(JLabel jl : list){
             getInstance().add(jl);
         }
+
         getInstance().updateUI();
 
     }
+
 
     public static ScorePanel getInstance(){
         return panel;

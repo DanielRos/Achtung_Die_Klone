@@ -10,8 +10,7 @@ public class Main {
 
         Action doOneStep = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-               gm.getState().tick();
-
+               gm.getCurrentState().tick();
             }
         };
 
@@ -29,11 +28,10 @@ public class Main {
     }
 
 }
-// byt ut trail och coordinate mot en worldclass
-// World ska ha en 2d array med alla pixlar
-// man ska kunna välja storlek på fönstret, och möjligen cirkeln
-// kanske fullscreen
-// upplösningar 800/600, 1280/900, 1440/900
-
-// för att veta var man ska rita upp cirkeln: <pythagoras sats> z = roten ur(x^2+y^2)
-// Om z <= radien ----> rita ut pixeln
+// fixa positionering av players
+// fixa sortering i scorepanel
+// lägg till PowerUps
+// gör ordentliga hål
+// finputsa kod
+// lägg till endgame panel
+// lägg till skott
