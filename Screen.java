@@ -15,7 +15,7 @@ import javax.swing.JFrame;
             window.dispose();
             window.setUndecorated(true);
             window.setVisible(true);
-            window.setSize(GUI.getScreenWidth(),GUI.getScreenHeight());
+            window.setSize(GUI.getFrameWidth(),GUI.getFrameHeight());
             window.setResizable(false);
             vc.setFullScreenWindow(window);
 

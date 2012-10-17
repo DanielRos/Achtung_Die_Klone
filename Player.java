@@ -1,46 +1,73 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-
-
 public class Player {
-    public Boolean isAlive;
-    private PixelColor color;
-    private double angle , speed;
-    private int x,y;
-    private int radius;
 
-    private String direction;
-    private String name;
-    private int leftKey;
-    private int rightKey;
-    private int weaponKey;
-    private Set<PlayerListener> PlayerListenerSet;
+    public boolean isAlive;
+    private final Color color;
+    private final Coordinate coordinate;
+    private final int radius;
+    private String name, direction;
+    private int leftKey, rightKey, score, holeCounter, nextHoleCounter, smoothStartCounter, powerUpEffectCounter;
+    private double angle, initSpeed, turnSpeed, speed, speedChange;
+    private boolean hole;
+    private final Set<PlayerListener> PlayerListenerSet;
 
-    public Player(int x, int y, String playerName, PixelColor color, int turnLeft, int turnRight) {
-        this.x = x;
-        this.y = y;
+    public Player(String playerName, Color color, int turnLeft, int turnRight) {
+        this.coordinate = new Coordinate(0.0, 0.0);
         this.name = playerName;
         this.color = color;
         this.rightKey = turnRight;
         this.leftKey = turnLeft;
-        this.weaponKey = weaponKey;
 
-        isAlive = true;
-        angle =  0;
+        angle =  Main.random(360);
         PlayerListenerSet = new HashSet<PlayerListener>();
         direction = "";
         radius = 5;
+        score = 9;
+        initSpeed = 2;
+        speed = initSpeed;
+        speedChange = 0;
+        turnSpeed = 2.5;
+        newRound();
+
     }
 
-    public void getNextPixel(){}
+    private void randomStartPos(Coordinate coo) {
+        double width = GamePanel.getGameArea().getWidth();
+        double height = GamePanel.getGameArea().getHeight();
 
-    public void holeGeneration(){}
+        double lowerMargin = 0.2;
+        double upperMargin = 0.8;
+        double x = Main.random(width* lowerMargin, width* upperMargin);
+        double y = Main.random(height* lowerMargin, height* upperMargin);
+
+        coo.setX(x);
+        coo.setY(y);
+    }
+
+    public void newRound(){
+        randomStartPos(coordinate);
+        speed = initSpeed;
+        isAlive = true;
+        prepareNextHole();
+        smoothStartCounter = 50;
+        speedChange = 0;
+
+    }
+
+    public void prepareNextHole(){
+        nextHoleCounter = Main.random(50,100);
+        holeCounter = 0;
+        hole = false;
+    }
+
+    public void prepareHole(){
+        holeCounter = Main.random(12,17);
+        nextHoleCounter = 0;
+        hole = true;
+    }
 
     public void addPlayerListener(PlayerListener pl){
         PlayerListenerSet.add(pl);
@@ -51,44 +78,94 @@ public class Player {
             pl.playerChanged();
         }
     }
+
     public void move(){
+        if(isAlive){
+            if (direction.equals("R")) angle += turnSpeed;
+            else if(direction.equals("L")) angle -= turnSpeed;
 
-        if (direction == "R") angle+=4;
-        else if(direction == "L") angle -=4;
+            angle %= 360;
 
-        speed = 4;
-        angle %= 360;
+            if (angle < 0) {
+                angle += 360;
+            }
+            float r = (float)Math.toRadians(angle);
 
-        if (angle < 0) {
-            angle += 360;
+            coordinate.moveX(Math.cos(r) * speed);
+            coordinate.moveY(Math.sin(r)* speed);
+
+            manageEffectsAndHoles();
+
+            notifyListeners();
         }
+    }
+
+    private void manageEffectsAndHoles() {
+        if(hole){
+            holeCounter--;
+            if(holeCounter <= 0)prepareNextHole();
+        }
+        else{
+            nextHoleCounter--;
+            if(nextHoleCounter <= 0)prepareHole();
+        }
+        if (smoothStartCounter > 0) smoothStartCounter--;
+
+        if (powerUpEffectCounter > 0) powerUpEffectCounter--;
+
+        else if(speedChange > 0 ){
+            resetSpeed();
+        }
+    }
+
+    public void affectedByPowerUp(int effectLifeTime) {
+        powerUpEffectCounter = effectLifeTime;
+    }
+
+    public Coordinate getNextPixel(Coordinate c, double angle, int radius){
         float r = (float)Math.toRadians(angle);
 
-        x += Math.cos(r) * speed;
-        y += Math.sin(r)* speed;
+        double x =  c.getX();
+        double y =  c.getY();
 
+        double dx =  Math.cos(r) * (radius+1);
+        double dy =  Math.sin(r) * (radius+1);
 
-            //position = new Coordinate(coordinate.getX(),coordinate.getY());
+        int nextXpixel;
+        int nextYpixel;
 
-        //position = new Coordinate(coordinate.getX(),coordinate.getY());
-            //trail.pushCoordinate(position);
-           // System.out.println("pushing coo   " + coordinate.getX() + "  "+ coordinate.getY() +"\n");
-               //sesmt
-        notifyListeners();
+        // ser till så att doubles av minusvärden och positiva värden avrundas korrekt
+        if(dx< 0){
+            nextXpixel = (int)Math.floor(dx);
+        }
+        else{
+            nextXpixel = (int)Math.ceil(dx);
+        }
+
+        if(dy< 0){
+            nextYpixel = (int)Math.floor(dy);
+        }
+        else{
+            nextYpixel = (int)Math.ceil(dy);
+        }
+
+        return new Coordinate ((int)x + nextXpixel, (int)y + nextYpixel);
 
     }
 
-    public int getX(){
-        return x;
+    public double getX(){
+        return coordinate.getX();
     }
-    public int getY(){
-        return y;
+
+    public double getY(){
+        return coordinate.getY();
     }
 
     public int getLeftKey() {
 
         return leftKey;
     }
+
     public int getRightKey() {
         return rightKey;
     }
@@ -97,12 +174,61 @@ public class Player {
         direction = d;
     }
 
-    public PixelColor getColor() {
+    public Color getColor() {
         return color;
     }
 
     public int getRadius() {
         return radius;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAlive(boolean b) {
+        isAlive = b;
+    }
+
+    public void increaseScore() {
+        score++;
+
+    }
+
+    public void resetScore(){
+        score = 0;
+    }
+
+    public void setSpeed() {
+        if (speedChange < radius){
+            speedChange++;
+            speed = speed + this.speedChange;
+        }
+    }
+
+    public void resetSpeed(){
+        speed -= speedChange;
+        speedChange = 0;
+    }
+
+    public boolean getHole() {
+        return hole ;
+    }
+
+    public boolean justStarted(){
+        return smoothStartCounter > 0;
     }
 }
 

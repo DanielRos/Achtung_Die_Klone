@@ -3,22 +3,40 @@ import java.awt.*;
 
 public class GUI extends JFrame {
 
-    private static int screenWidth = 1280;
-    private static int screenHeight = 900;
-
+    private static int frameWidth;
+    private static int frameHeight;
     private Screen s;
-    private PlayerComponent pc;
 
-    public GUI(PlayerComponent component){
+    JPanel cards;
+    final static String SETUPPANEL = "Setup";
+    final static String GAMEPANEL = "Start Game";
+    final static String GAMEENDEDPANEL = "Game Ended";
+    private static GUI reference;
+
+    public GUI(){
         super("Achtung Die Klone");
-        pc = component;
-        setLayout(new BorderLayout());
+        reference = this;
+
         //chooseDisplayMode();
-        setSize(1280,900);
-        createPlayers();
-        new World(screenWidth,screenHeight);
-        System.out.printf("%d : %d\n",screenWidth,screenHeight);
+        frameWidth = 1280;
+        frameHeight = 800;
+
+        setSize(frameWidth,frameHeight);
+
+        JPanel card1 = new SetupPanel(frameWidth, frameHeight);
+        JPanel card2 = new GamePanel();
+        JPanel card3 = new GameEndedPanel(frameWidth,frameHeight);
+        cards = new JPanel(new CardLayout());
+        cards.setLayout(new CardLayout());
+        cards.add(card1, SETUPPANEL);
+        cards.add(card2, GAMEPANEL);
+        cards.add(card3, GAMEENDEDPANEL);
+        add(cards);
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+        setResizable(false);
+
     }
 
     public void chooseDisplayMode(){
@@ -35,42 +53,47 @@ public class GUI extends JFrame {
                 options[0]);
         if(optionChosen==0){
             choice =  new DisplayMode(800,600, 16, DisplayMode.REFRESH_RATE_UNKNOWN);
-            screenWidth = 800;
-            screenHeight = 600;
+            frameWidth = 800;
+            frameHeight = 600;
         }
         else if (optionChosen==1){
             choice = new DisplayMode(1200,800, 16, DisplayMode.REFRESH_RATE_UNKNOWN);
-            screenWidth = 1200;
-            screenHeight = 800;
+            frameWidth = 1200;
+            frameHeight = 800;
         }
         else if (optionChosen==2){
             choice = new DisplayMode(1440,900, 16, DisplayMode.REFRESH_RATE_UNKNOWN);
-            screenWidth = 1440;
-            screenHeight = 900;
+            frameWidth = 1440;
+            frameHeight = 900;
         }
         else{choice = null; System.exit(0);}
 
         run(choice);
     }
-    public void createPlayers(){
-        add(pc, BorderLayout.CENTER);
 
-        //add(GameManager.createPlayer(),BorderLayout.CENTER);
-        //add(GameManager.createPlayer(),BorderLayout.CENTER);
-
-    }
     public void run(DisplayMode dm){
-        //getContentPane().setBackground(Color.BLACK);
         s = new Screen();
         s.setFullScreen(dm, this);
     }
-    public static int getScreenWidth() {
-        return screenWidth;
+
+    public static int getFrameWidth() {
+        return frameWidth;
     }
 
-    public static int getScreenHeight() {
-        return screenHeight;
+    public static int getFrameHeight() {
+        return frameHeight;
     }
 
+    public static GUI getInstance(){
+        return reference;
+    }
 
+    public void setPanel(String changeTo)
+    {
+        CardLayout cl = (CardLayout)cards.getLayout();
+        cl.show(cards, changeTo);
+
+        GameManager.setState(changeTo, SETUPPANEL, GAMEPANEL, GAMEENDEDPANEL);
+
+    }
 }
